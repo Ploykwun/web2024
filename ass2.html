@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@3.7.4/dist/vuetify.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@3.7.4/dist/vuetify.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css" rel="stylesheet">
+
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0&icon_names=family_star" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=globe" />
+
+        <link rel="stylesheet" href="./ass2.json">
+
+    <title>work2:My first Vue page</title>
+
+
+
+    <style>
+        * {
+            font-family: "Mitr";
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+
+        }
+
+        .bgbtn {
+            background-color: rgb(233, 153, 245);
+        }
+
+
+        .pa-4 {
+            padding: 16px;
+        }
+
+        .my-1 {
+            margin: 8px 0;
+        }
+
+        v-radio-group {
+            display: block;
+            margin-bottom: 16px;
+        }
+
+        v-radio {
+            margin: 4px 0;
+        }
+
+        .mitr-light {
+            font-family: "Mitr", sans-serif;
+            font-weight: 50;
+            font-style: normal;
+        }
+        .bgcard{
+            background-color: rgb(240, 233, 222);
+        }
+
+
+
+
+        .material-symbols-outlined {
+            font-variation-settings:
+                'FILL' 0,
+                'wght' 400,
+                'GRAD' 0,
+                'opsz' 24;
+
+            font-size: 80px;
+            /* ปรับขนาดไอคอน */
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+
+
+        <v-app>
+            <div class="pa-4 bg-success text-white text-center ">แบบทดสอบภูมมิศาสตร์</div>
+            <div v-if="page === 1" class="text-center">
+
+                <br>
+
+                <div>
+                    <span class="material-symbols-outlined">
+                        globe
+                    </span>
+                </div>
+
+                <div>
+                    <h2>มาวัดความรู้ทางภูมิสาสตร์กันเถอะ</h2>
+                </div>
+
+                <div>
+                    <v-btn @click="page = 2" class="ma-10 bgbtn">เริ่มทำแบบทดสอบ</v-btn>
+                </div>
+            </div>
+
+
+            <div v-if="page === 2">
+                <div v-for="(q, i) in qlist" :key="i" class="my-1 pa-4 border">
+                    <p>ข้อที่ {{ i + 1 }}</p>
+                    <div v-html="q.title" class="pa-2"></div>
+                    <v-radio-group v-model="answers[i]" class="mt-2">
+                        <v-radio v-for="(otxt, ov) in q.options" :key="ov" :value="ov + 1" :label="otxt"></v-radio>
+                    </v-radio-group>
+                </div>
+
+                <div class="position-sticky bottom-0 pa-4 bg-primary text-white">
+                    <v-btn v-if="validate()" @click="grading()" class="bg-success">
+                        <v-icon>mdi-check</v-icon> ตรวจคำตอบ
+                    </v-btn>
+                    <div v-else>กรุณาตอบให้ครบ </div>
+
+
+                </div>
+            </div>
+
+            <div v-if="page === 3" class="text-center text-success">
+                <br>
+
+                <v-card class="mx-auto my-8 bgcard" elevation="16" max-width="344">
+                    <v-card-item>
+                        <v-card-title>
+                            <h4>ประกาศผลคะแนน</h4>
+                        </v-card-title>
+
+                        <v-card-subtitle>
+                            <div class="text-success">
+                                <h2>คุณได้คะแนน {{ score }}/20</h2>
+                            </div>
+                        </v-card-subtitle>
+                    </v-card-item>
+
+                    <v-card-text>
+                        คุณทำดีมาก
+                    </v-card-text>
+                </v-card>
+
+
+                <v-btn @click="resetQuiz" class="ma-4" color="primary">ทำแบบทดสอบใหม่</v-btn>
+            </div>
+
+        </v-app>
+    </div>
+
+
+
+    <script>
+        const { createApp } = Vue;
+        const { createVuetify } = Vuetify;
+
+        const vuetify = createVuetify();
+
+        createApp({
+            data() {
+                return {
+                    qlist: [],
+                    answers: [],
+                    score: 0,
+                    page: 1,
+                };
+            },
+            mounted() {
+                this.load_data();
+            },
+            methods: {
+                async load_data() {
+                    try {
+                        const res = await fetch("ass2.json");
+                        this.qlist = await res.json();
+                        this.answers = new Array(this.qlist.length).fill(null);
+                    } catch (err) {
+                        console.error("Failed to load data:", err);
+                    }
+                },
+                validate() {
+                    return this.answers.every((answer) => answer !== null);
+                },
+                grading() {
+                    let score = 0;
+                    this.qlist.forEach((q, index) => {
+                        if (this.answers[index] === q.answer) {
+                            score++;
+                        }
+                    });
+                    this.score = score;
+                    this.page = 3;
+                },
+                resetQuiz() {
+                    this.answers = new Array(this.qlist.length).fill(null);
+                    this.score = 0;
+                    this.page = 1;
+                },
+            },
+        }).use(vuetify).mount("#app");
+    </script>
+
+</body>
+
+</html>

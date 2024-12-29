@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@200;300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+
+
+</head>
+
+
+<style>
+    * {
+        font-family: "Mitr", serif;
+        font-weight: 400;
+        font-style: normal;
+    }
+
+    .bg-custom {
+        background-color: rgb(102, 170, 238);
+
+    }
+</style>
+
+<body class="p-3 mb-2 bg-body-secondary text-dark">
+
+    <div id="myapp" class="container p-4  "></div>
+
+    <script type="text/babel">
+        class App extends React.Component {
+            constructor() {
+                super();
+                this.state = {
+                    qlist: [],
+                    status: 0,
+                    answers: {},
+                    score: 0,
+                };
+            }
+
+            async componentDidMount() {
+                // ตัวเอาข้อมูลจาก json
+                const res = await fetch("ass3.json");
+                const data = await res.json();
+                this.setState({ qlist: data });
+            }
+
+            checkAnswer = () => {
+                const { qlist, answers } = this.state;
+
+                // ตรวจสอบว่ามีคำตอบครบทุกข้อหรือไม่
+                const allAnswered = qlist.every((_, i) => answers[`q${i}`] !== undefined);
+
+                if (!allAnswered) {
+                    alert("กรุณาตอบคำถามให้ครบทุกข้อก่อนตรวจคำตอบ!");
+                    return; // ออกจากฟังก์ชันหากยังตอบไม่ครบ
+                }
+
+                // คำนวณคะแนน
+                let score = 0;
+                qlist.forEach((q, i) => {
+                    if (q.answer === parseInt(answers[`q${i}`])) {
+                        score++;
+                    }
+                });
+
+                this.setState({ status: 2, score });
+            };
+
+            handleAnswerChange = (qIndex, value) => {
+                this.setState((prevState) => ({
+                    answers: {
+                        ...prevState.answers,
+                        [`q${qIndex}`]: value,
+                    },
+                }));
+            };
+
+            render() {
+                const { status, qlist, score } = this.state;
+
+                return (//หน้าจอ
+                    <div className="card">
+                        <div className="container-fluid p-5 bg-custom text-black text-center ">
+                            <h4 class="fw-bold">แบบทดสอบ เข้าม.1 วิชาเศรษฐศาสตร์ </h4>
+                        </div>
+                        <div className="card-body">
+                            {status === 0 && (
+                                <div className="text-center">
+                                    <div class="card-body">
+
+                                        <p class="card-text fw-ligh text-center">
+                                            สอบวันที่ 26 ธันวาคม 2567
+                                            เวลา 9:00 น. - 12:00 น. <br />
+                                            อาจารย์ประจำวิชา สมชาย รักชาติยิ่งชีพ <br />
+                                            โรงเรียนลูกแก้วเจ็ดสีแห่งมังกรทอง
+
+                                        </p>
+                                    </div>
+                                    <button //ปุ่มเริ่ม
+                                        className="btn btn-primary"
+                                        onClick={() => this.setState({ status: 1 })}
+                                    >
+                                        เริ่มทำแบบทดสอบ
+                                    </button>
+
+
+                                </div>
+                            )}
+
+                            {status === 1 && (  //โจทย์
+                                <div >
+                                    {qlist.map((q, i) => (
+                                        <div key={i} className="mb-4 ">
+                                            <h5 class="fw-medium">
+                                                {i + 1}. {q.title}
+                                            </h5>
+                                            {q.options.map((option, index) => (
+                                                <div key={index}>
+                                                    <input
+                                                        type="radio"
+                                                        name={`q${i}`}
+                                                        value={index + 1}
+                                                        onChange={(e) =>
+                                                            this.handleAnswerChange(i, parseInt(e.target.value))
+                                                        }
+                                                    />
+                                                    <label className="ms-2">{option}</label>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ))}
+                                    <div class="text-center mb-3  ">
+
+                                        <button   //ปุ่มสำหรับตรวจคำตอบ
+                                            className="btn btn-success "
+                                            onClick={this.checkAnswer}
+                                        >
+                                            ตรวจคำตอบ
+                                        </button>
+                                    </div>
+
+                                </div>
+                            )}
+                            {status === 2 && ( //หน้ารวมคะแนน
+                                <div className="text-center">
+                                    <div className="text-success">
+                                        <h5>
+                                            คุณได้คะแนน: {score} / {qlist.length}{" "}
+                                            {score === qlist.length ? "🎉🎉" : score > qlist.length / 2 ? "😊👍" : "😔"}
+                                        </h5>
+                                    </div>
+                                    <button
+                                        className="btn btn-success"
+                                        onClick={() => this.setState({ status: 0, answers: {}, score: 0 })}
+                                    >
+                                        ทำแบบทดสอบอีกครั้ง
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                        <div className="card-footer text-center ">
+                            <small>663380355-6 พลอยขวัญ อุปสัย</small>
+                        </div>
+
+
+                    </div>
+                );
+            }
+        }
+
+        ReactDOM.render(<App />, document.getElementById("myapp"));
+    </script>
+</body>
+
+</html>

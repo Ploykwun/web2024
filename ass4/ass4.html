@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+</head>
+
+<body>
+
+    <a-scene>
+        <a-camera position="0 1.8 0"></a-camera>
+
+        <a-entity mixin="marker" position="-2.5 0.7 0.01"></a-entity>
+
+        <!--ข้อความ-->
+        <a-entity id="size" position="-5.52279 1.8 -2.10735"
+            animation="dir: alternate; loop: true; property: scale; to: 2 2 2"
+            text="align: center; color: white; value: IT Sec.2 663380355-6 Ploykwun Uopasai; width: 4"
+            scale="1.7064682444404788 1.7064682444404788 1.228056000440613" rotation="0 71.994 0">
+        </a-entity>
+        
+        <a-entity id="size" position="-5.59801 2.35125 -1.8846"
+            animation="dir: alternate; loop: true; property: scale; to: 2 2 2"
+            text="align: center; color: white; value: Please,Click on the screen;"
+            scale="4.92874 5 5.56407" rotation="0 71.994 0">
+        </a-entity>
+
+        <!--โมเดล -->
+        <a-entity gltf-model="assets/models/maxwell_the_cat_with_bones_animation.glb"
+            position="-3.28105 -0.15228 1.79192" scale="3.26729 3.27865 3.48302"
+            animation="dur: 3000; easing: linear; from: 0 0 0; loop: true; property: rotation; to: 0 360 0"
+            rotation="0 269.946 0"></a-entity>
+
+
+
+
+        <a-entity gltf-model="assets/models/Tomato.glb" position="-5.58614 -0.658 -3.18" scale="0.813 0.774 0.769"
+            animation="dur: 4000; easing: linear; from: 0 0 0; loop: true; property: rotation; to: 0 360 0"
+            rotation="0 269.946 0">
+        </a-entity><a-entity gltf-model="assets/models/Tomato.glb" position="-3.81874 -1.25465 -0.79027"
+            scale="0.813 0.774 0.769"
+            animation="dur: 4000; easing: linear; from: 0 0 0; loop: true; property: rotation; to: 0 360 0"
+            rotation="0 198.045 0">
+        </a-entity><a-entity gltf-model="assets/models/Tomato.glb" position="-2.73876 -1.43827 -3.99176"
+            scale="0.813 0.774 0.769"
+            animation="dur: 4000; easing: linear; from: 0 0 0; loop: true; property: rotation; to: 0 360 0"
+            rotation="0 81.00900000214577 0">
+        </a-entity>
+
+        <!-- ฉากหลัง -->
+        <a-sky color="#FFFFFF" src="/img/background.jpg"></a-sky>
+
+        <a-sound id="sound" src="#bgmusic" loop="true" volume="0.4"></a-sound>
+    </a-scene>
+
+    <!--  เล่นเสียงเมื่อผู้ใช้คลิก -->
+    <script>
+        document.querySelector('a-scene').addEventListener('click', function () {
+            var sound = document.querySelector('#sound');
+            sound.components.sound.playSound();
+        });
+    </script>
+
+
+    <a-assets>
+        <a-asset-item id="carrot" src="assets/models/Carrot Character.glb"></a-asset-item>
+        <a-asset-item id="husky" src="assets/models/maxwell_the_cat_with_bones_animation.glb"></a-asset-item>
+        <a-asset-item id="husky" src="assets/models/Tomato.glb"></a-asset-item>
+        <audio id="bgmusic" src="assets/sound/uia_cat.mp3"></audio>
+    </a-assets>
+
+    </a-scene>
+
+</body>
+
+</html>
